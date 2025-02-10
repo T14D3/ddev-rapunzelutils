@@ -1,0 +1,4 @@
+#ddev-generated
+helloworld:
+  container: web
+  command: bash -c "echo 'Hello World!'"

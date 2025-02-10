@@ -1,8 +1,8 @@
 #ddev-generated
-# Simple template to demonstrate addon-template
+# Simple template to demonstrate rapunzelutils
 services:
-  addon-template:
-    container_name: ddev-${DDEV_SITENAME}-addon-template
+  rapunzelutils:
+    container_name: ddev-${DDEV_SITENAME}-rapunzelutils
     image: busybox:stable
     command: tail -f /dev/null
     restart: "no"
@@ -14,3 +14,4 @@ services:
     volumes:
     - ".:/mnt/ddev_config"
     - "ddev-global-cache:/mnt/ddev-global-cache"
+    - "./aliases.yaml:/etc/aliases.yaml"

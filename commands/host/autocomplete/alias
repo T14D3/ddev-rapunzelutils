@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#ddev-generated
+
+# Check file exists
+ALIASES_FILE=".ddev/aliases.yaml"
+
+if [ ! -f "$ALIASES_FILE" ]; then
+  exit 0
+fi
+
+# Load a list of all top level aliases
+aliases=$(yq '. | keys | .[]' "$ALIASES_FILE")
+
+printf "%s\n" "${aliases[@]}"

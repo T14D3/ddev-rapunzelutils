@@ -1,6 +1,6 @@
 # Details about the install.yaml file are at https://ddev.readthedocs.io/en/stable/users/extend/additional-services/#sections-and-features-of-ddev-get-add-on-installyaml
 
-name: addon-template
+name: rapunzelutils
 
 # pre_install_actions - list of actions to run before installing the addon.
 # Examples would be removing an extraneous docker volume,
@@ -8,6 +8,23 @@ name: addon-template
 # DDEV environment variables can be interpolated into these actions
 # pre_install_actions are executed in the context of the target project's root directory.
 pre_install_actions:
+  # Check if yq is installed, if not, install it
+  - |
+    #ddev-description:Check if yq is installed
+    if ! command -v yq &> /dev/null; then
+      echo "yq could not be found, installing..."
+      if [ "$(uname)" == "Darwin" ]; then
+        brew install yq
+      elif [ "$(uname)" == "Linux" ]; then
+        sudo apt-get update && sudo apt-get install -y yq
+      else
+        echo "Unsupported OS for automatic yq installation. Please install yq manually."
+        exit 1
+      fi
+    else
+      echo "yq is already installed!"
+    fi
+
   # - |
   #   #ddev-description:Check architecture type for incompatible arm64 type
   #   if [ "$(uname -m)" = "arm64" -o "$(uname -m)" = "aarch64" ]; then
@@ -59,10 +76,13 @@ pre_install_actions:
 # If you use directories, they must be directories that are managed
 # by this add-on, or removal could remove things that are not owned by it
 project_files:
-  - docker-compose.addon-template.yaml
+  - docker-compose.rapunzelutils.yaml
+  - aliases.yaml
+  - commands/host/alias
+  - commands/host/autocomplete/alias
   # - commands/web/add-on-command
   # - commands/host/add-on-command-host
-  # - web-build/Dockerfile.addon-template
+  # - web-build/Dockerfile.rapunzelutils
   # - some-directory/file1.txt
   # - some-directory/file2.txt
   # - extra_files_dir_created_by_this_template/
@@ -93,19 +113,21 @@ dependencies:
 post_install_actions:
   # - chmod +x ~/.ddev/commands/web/somecommand
   # - touch ${DDEV_APPROOT}/somefile.${GOOS}.${DDEV_WEBSERVER}
-  # - perl -pi -e 's/oldstring/newstring/g' ${DDEV_APPROOT}/.ddev/docker-compose.addon-template.yaml
+  # - perl -pi -e 's/oldstring/newstring/g' ${DDEV_APPROOT}/.ddev/docker-compose.rapunzelutils.yaml
+  - ddev exec "cp /mnt/ddev_config/aliases.yaml ~/.aliases.yaml"
+  - ddev exec "chmod +x ~/.aliases.yaml"
+  - ddev exec "echo 'source ~/.aliases.yaml' >> ~/.bashrc"
 
 # Shell actions that can be done during removal of the add-on.
 # Files listed in project_files section will be automatically removed here if they contain #ddev-generated line.
 # removal_actions are executed in the context of the target project's .ddev directory.
-removal_actions:
   # - rm ~/.ddev/commands/web/somecommand
   # - |
-  #   if [ -f ${DDEV_APPROOT}/.ddev/docker-compose.addon-template_extras.yaml ]; then
-  #     if grep -q '#ddev-generated' ${DDEV_APPROOT}/.ddev/docker-compose.addon-template_extras.yaml; then
-  #       rm -f ${DDEV_APPROOT}/.ddev/docker-compose.addon-template_extras.yaml
+  #   if [ -f ${DDEV_APPROOT}/.ddev/docker-compose.rapunzelutils_extras.yaml ]; then
+  #     if grep -q '#ddev-generated' ${DDEV_APPROOT}/.ddev/docker-compose.rapunzelutils_extras.yaml; then
+  #       rm -f ${DDEV_APPROOT}/.ddev/docker-compose.rapunzelutils_extras.yaml
   #     else
-  #       echo "Unwilling to remove '${DDEV_APPROOT}/.ddev/docker-compose.addon-template_extras.yaml' because it does not have #ddev-generated in it; you can manually delete it if it is safe to delete."
+  #       echo "Unwilling to remove '${DDEV_APPROOT}/.ddev/docker-compose.rapunzelutils_extras.yaml' because it does not have #ddev-generated in it; you can manually delete it if it is safe to delete."
   #     fi
   #   fi
 
