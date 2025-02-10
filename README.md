@@ -49,7 +49,7 @@ ddev alias --add cc web "php bin/console cache:clear"
 And then we can use the alias like this:
 
 ```sh
-ddev cc
+ddev alias cc
 ```
 The output will look something like this:
 
